@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Appointment System</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <!-- Input fields for hospital and slot number -->
+    <input type="text" id="hospitalName" placeholder="Enter Hospital Name">
+    <input type="text" id="slotNo" placeholder="Enter Slot Number">
+    <button id="fetchDataBtn">Fetch Data</button>
+
+    <!-- Container to display the sorted data -->
+    <div id="resultContainer"></div>
+
+    <!-- Schedule Appointment Button -->
+    <button id="scheduleAppointmentBtn">Schedule Appointments</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "medq-sih.firebaseapp.com",
+            databaseURL: "https://medq-sih-default-rtdb.firebaseio.com",
+            projectId: "medq-sih",
+            storageBucket: "medq-sih.appspot.com",
+            messagingSenderId: "1096780404339",
+            appId: "1:1096780404339:web:4a3f85b45a1ef40d6efc06",
+            measurementId: "G-G8N7G2GN6L"
+        };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+    
+        const fetchDataBtn = document.getElementById('fetchDataBtn');
+        const scheduleAppointmentBtn = document.getElementById('scheduleAppointmentBtn');
+        const resultsContainer = document.getElementById('resultContainer');
+        let fetchedData = {};  // Variable to hold fetched data
+    
+        // Fetching data
+        fetchDataBtn.addEventListener('click', () => {
+            const hospitalName = document.getElementById('hospitalName').value;
+            const slotNo = document.getElementById('slotNo').value;
+    
+            if (hospitalName && slotNo) {
+                // Fetch data from Firebase
+                const dbRef = ref(db, `patient/${hospitalName}/${slotNo}`);
+                get(dbRef)
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        fetchedData = snapshot.val();  // Save fetched data
+                        displayData(fetchedData);
+                    } else {
+                        resultsContainer.innerHTML = 'No data available for this slot.';
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching data:', error);
+                    alert('Error fetching data: ' + error.message);
+                });
+            } else {
+                alert('Please enter both hospital name and slot number.');
+            }
+        });
+    
+        // Function to display fetched data
+        function displayData(data) {
+            resultsContainer.innerHTML = ''; // Clear previous results
+            for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                    const patient = data[key];
+                    const patientInfo = `
+                        <div>
+                            <strong>Patient Name:</strong> ${patient.patient_name || 'N/A'} <br>
+                            <strong>Phone Number:</strong> ${patient.phone_number || 'N/A'} <br>
+                            <strong>Concern:</strong> ${patient.concern || 'N/A'} <br>
+                            <strong>Symptoms:</strong> ${patient.symptoms || 'N/A'} <br>
+                            <strong>Slot Number:</strong> ${patient.slot_number || 'N/A'} <br>
+                            <hr>
+                        </div>
+                    `;
+                    resultsContainer.innerHTML += patientInfo;
+                }
+            }
+        }
+
+        // Handle appointment scheduling
+        scheduleAppointmentBtn.addEventListener('click', () => {
+            // Convert the fetched data to JSON
+            const patientData = JSON.stringify(fetchedData);
+            
+            // Send the data to the Flask backend
+            fetch('/add_appointment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: patientData
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url; // Redirect to the schedule page
+                } else {
+                    alert('Error scheduling appointment.');
+                }
+            })
+            .catch(error => {
+                console.error('Error scheduling appointment:', error);
+            });
+        });
+    </script>
+</body>
+</html>

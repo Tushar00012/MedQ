@@ -1,0 +1,58 @@
+
+        body {
+            text-align: center; /* Center align all text in the body */
+            font-family: Arial, sans-serif; /* Adding a default font for better appearance */
+        }
+        
+        .category-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* Center align the images */
+            gap: 10px; /* Space between images */
+        }
+
+        .category-item {
+            text-align: center;
+            margin: 10px;
+        }
+
+        .category-image {
+            width: 80px; /* Adjust this size as needed */
+            height: 80px; /* Ensure this matches the width for a circular shape */
+            border-radius: 50%; /* Makes the image circular */
+            object-fit: cover; /* Ensures the image covers the circle area */
+            margin-bottom: 5px; /* Space between image and text */
+        }
+
+        .category-container img {
+            max-width: 100%; /* Ensure images do not overflow their container */
+        }
+
+        .view-more {
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        /* Adding some styling to the form inputs for better UX */
+        input[type="text"], input[type="number"], textarea {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"], button {
+            background-color: #4CAF50; /* Green background */
+            color: white; /* White text */
+            padding: 10px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover, button:hover {
+            background-color: #45a049;
+        }

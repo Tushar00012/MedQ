@@ -1,0 +1,24 @@
+{
+    "Covid": [
+        "Fever or chills",
+        "Cough",
+        "Shortness of breath",
+        "Fatigue",
+        "Loss of taste or smell"
+    ],
+    "Skin and Hair": [
+        "Itching",
+        "Rashes",
+        "Hair loss",
+        "Dry skin",
+        "Acne"
+    ],
+    "Women Health": [
+        "Pregnancy",
+        "Menstrual cramps",
+        "Hot flashes",
+        "Breast tenderness",
+        "Fatigue"
+    ]
+}
+    

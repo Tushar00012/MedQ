@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPD Priority Scheduling</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            margin: 0;
+            font-size: 2em;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .category-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .category-item {
+            text-align: center;
+            width: 120px;
+        }
+
+        .category-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 5px;
+            transition: transform 0.2s;
+        }
+
+        .category-image:hover {
+            transform: scale(1.1);
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        label {
+            cursor: pointer;
+            display: inline-block;
+            text-align: center;
+        }
+
+        input[type="text"], input[type="number"], textarea {
+            width: calc(100% - 40px);
+            padding: 12px;
+            margin: 10px auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        input[type="submit"], button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+
+        input[type="submit"]:hover, button:hover {
+            background-color: #218838;
+        }
+
+        button {
+            background-color: #007bff;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .view-more {
+            margin-top: 20px;
+            display: inline-block;
+        }
+    </style>
+    </style>
+    <script>
+        function updateSymptoms() {
+            var category = document.querySelector('select[name="category"]').value;
+            var symptomsSelect = document.getElementById('symptoms');
+    
+            symptomsSelect.innerHTML = ''; // Clear existing options
+    
+            if (category) {
+                // Fetch symptoms data from the server based on the selected category
+                fetch(`/symptoms?category=${category}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(function(symptom) {
+                            var option = document.createElement('option');
+                            option.value = symptom;
+                            option.textContent = symptom;
+                            symptomsSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('select[name="category"]').addEventListener('change', updateSymptoms);
+    
+            // Initialize symptoms on page load if a category is pre-selected
+            updateSymptoms();
+        });
+    </script>
+    
+</head>
+<body>
+    <h1>OPD Priority Scheduling</h1>
+    <form method="POST" action="{{ url_for('add_appointment') }}">
+        <label for="name" style = " front-weight: bold; front-size : 18px;">Name:</label><br>
+        <input type="text" name="name" id="name" required><br><br>
+
+        <label for="age">Age:</label>
+        <input type="number" name="age" id="age" required><br><br>
+
+        <label for="category">Select Category:</label><br>
+        <div class="category-container">
+            <div class="category-item">
+                <input type="radio" name="category" value="Covid" id="Covid" required>
+                <label for="Covid">
+                    <img src="{{ url_for('static', filename='images/coronavirus.png') }}" 
+                         alt="Covid" 
+                         class="category-image">
+                    <br>Covid
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Skin and Hair" id="Skin and Hair" required>
+                <label for="Skin and Hair">
+                    <img src="{{ url_for('static', filename='images/allergy.png') }}" 
+                         alt="Skin and Hair" 
+                         class="category-image">
+                    <br>Skin and Hair
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Women health" id="Women health" required>
+                <label for="Women health">
+                    <img src="{{ url_for('static', filename='images/woman.png') }}" 
+                         alt="Women health" 
+                         class="category-image">
+                    <br>Women health
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="General physician" id="General physician" required>
+                <label for="General physician">
+                    <img src="{{ url_for('static', filename='images/stethoscope.png') }}" 
+                         alt="General physician" 
+                         class="category-image">
+                    <br>General physician
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Dental Care" id="Dental Care" required>
+                <label for="Dental Care">
+                    <img src="{{ url_for('static', filename='images/floss.png') }}" 
+                         alt="Dental Care" 
+                         class="category-image">
+                    <br>Dental Care
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Bones and Joints" id="Bones and Joints" required>
+                <label for="Bones and Joints">
+                    <img src="{{ url_for('static', filename='images/pain-in-joints.png') }}" 
+                         alt="Bones and Joints" 
+                         class="category-image">
+                    <br>Bones and Joints
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Mental Wellness" id="Mental Wellness" required>
+                <label for="Mental Wellness">
+                    <img src="{{ url_for('static', filename='images/mental-health.png') }}" 
+                         alt="Mental Wellness" 
+                         class="category-image">
+                    <br>Mental Wellness
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Ear, Nose & Throat" id="Ear, Nose & Throat" required>
+                <label for="Ear, Nose & Throat">
+                    <img src="{{ url_for('static', filename='images/sore-throat.png') }}" 
+                         alt="Ear, Nose & Throat" 
+                         class="category-image">
+                    <br>Ear, Nose & Throat
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Sexual Health" id="Sexual Health" required>
+                <label for="Sexual Health">
+                    <img src="{{ url_for('static', filename='images/std.png') }}" 
+                         alt="Sexual Health" 
+                         class="category-image">
+                    <br>Sexual Health
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Child Specialist" id="Child Specialist" required>
+                <label for="Child Specialist">
+                    <img src="{{ url_for('static', filename='images/specialist.png') }}" 
+                         alt="Child Specialist" 
+                         class="category-image">
+                    <br>Child Specialist
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Homeopathy" id="Homeopathy" required>
+                <label for="Homeopathy">
+                    <img src="{{ url_for('static', filename='images/homeopathy.png') }}" 
+                         alt="Homeopathy" 
+                         class="category-image">
+                    <br>Homeopathy
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Digestive Issues" id="Digestive Issues" required>
+                <label for="Digestive Issues">
+                    <img src="{{ url_for('static', filename='images/heart-problem.png') }}" 
+                         alt="Digestive Issues" 
+                         class="category-image">
+                    <br>Digestive Issues
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Eye Specialist" id="Eye Specialist" required>
+                <label for="Eye Specialist">
+                    <img src="{{ url_for('static', filename='images/ophtalmology.png') }}" 
+                         alt="Eye Specialist" 
+                         class="category-image">
+                    <br>Eye Specialist
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Heart" id="Heart" required>
+                <label for="Heart">
+                    <img src="{{ url_for('static', filename='images/heart-attack.png') }}" 
+                         alt="Heart" 
+                         class="category-image">
+                    <br>Heart
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Physiotherapy" id="Physiotherapy" required>
+                <label for="Physiotherapy">
+                    <img src="{{ url_for('static', filename='images/physical-therapy.png') }}" 
+                         alt="Physiotherapy" 
+                         class="category-image">
+                    <br>Physiotherapy
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Brain & Nerves" id="Brain & Nerves" required>
+                <label for="Brain & Nerves">
+                    <img src="{{ url_for('static', filename='images/brain.png') }}" 
+                         alt="Brain & Nerves" 
+                         class="category-image">
+                    <br>Brain & Nerves
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Lungs & Breathing" id="Lungs & Breathing" required>
+                <label for="Lungs & Breathing">
+                    <img src="{{ url_for('static', filename='images/lungs.png') }}" 
+                         alt="Lungs & Breathing" 
+                         class="category-image">
+                    <br>Lungs & Breathing
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Kidney Issues" id="Kidney Issues" required>
+                <label for="Kidney Issues">
+                    <img src="{{ url_for('static', filename='images/kidney.png') }}" 
+                         alt="Kidney Issues" 
+                         class="category-image">
+                    <br>Kidney Issues
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="General Surgery" id="General Surgery" required>
+                <label for="General Surgery">
+                    <img src="{{ url_for('static', filename='images/plastic-surgery.png') }}" 
+                         alt="General Surgery" 
+                         class="category-image">
+                    <br>General Surgery
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Diabetes Management" id="Diabetes Management" required>
+                <label for="Diabetes Management">
+                    <img src="{{ url_for('static', filename='images/sugar-blood-level.png') }}" 
+                         alt="Diabetes Management" 
+                         class="category-image">
+                    <br>Diabetes Management
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Ayurveda" id="Ayurveda" required>
+                <label for="Ayurveda">
+                    <img src="{{ url_for('static', filename='images/ayurveda.png') }}" 
+                         alt="Ayurveda" 
+                         class="category-image">
+                    <br>Ayurveda
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Cancer" id="Cancer" required>
+                <label for="Cancer">
+                    <img src="{{ url_for('static', filename='images/breast-cancer.png') }}" 
+                         alt="Cancer" 
+                         class="category-image">
+                    <br>Cancer
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Urinary Issues" id="Urinary Issues" required>
+                <label for="Urinary Issues">
+                    <img src="{{ url_for('static', filename='images/bladder.png') }}" 
+                         alt="Urinary Issues" 
+                         class="category-image">
+                    <br>Urinary Issues
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Veterinary" id="Veterinary" required>
+                <label for="Veterinary">
+                    <img src="{{ url_for('static', filename='images/veterinary.png') }}" 
+                         alt="Veterinary" 
+                         class="category-image">
+                    <br>Veterinary
+                </label>
+            </div>
+            <div class="category-item">
+                <input type="radio" name="category" value="Diet & Nutrition" id="Diet & Nutrition" required>
+                <label for="Diet & Nutrition">
+                    <img src="{{ url_for('static', filename='images/diet.png') }}" 
+                         alt="Diet & Nutrition" 
+                         class="category-image">
+                    <br>Diet & Nutrition
+                </label>
+            </div>
+        </div>
+        
+      
+
+        <label for="symptoms" style="font-weight: bold; font-size: 18px;">Symptoms:</label><br>
+        <textarea name="symptoms" id="symptoms" rows="4" cols="50" required></textarea><br><br>
+
+
+        <input type="submit" value="Add Appointment">
+        <a href="{{ url_for('schedule') }}"><button type="button">Schedule Appointment</button></a>
+    </form>
+</body>
+</html>
+
